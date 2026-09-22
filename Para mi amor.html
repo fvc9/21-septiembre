@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Inline SVG Favicon to eliminate 404 console errors -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌻</text></svg>">
+    <title>Nuestras Flores Amarillas • 21 de Septiembre</title>
+
+    <style>
+        :root {
+            --primary-yellow: #f59e0b;
+            --accent-gold: #f5af19;
+            --deep-gold: #d97706;
+            --warm-amber: #b45309;
+            --soft-cream: #fdfbf7;
+            --light-cream: #fffbeb;
+            --stem-green: #22c55e;
+            --leaf-green: #15803d;
+            --terracotta: #c2410c;
+            --terracotta-dark: #9a3412;
+            --text-dark: #451a03;
+            --text-muted: #78350f;
+            --radius-card: 20px;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: linear-gradient(180deg, #fffdfa 0%, #fef3c7 50%, #fde68a 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 14px 12px 30px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient floating petals background canvas */
+        #ambient-canvas, #celebration-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+        }
+        #ambient-canvas { z-index: 1; }
+        #celebration-canvas { z-index: 999; }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        header {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .pill-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(254, 243, 199, 0.85);
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.12);
+            margin-bottom: 8px;
+            backdrop-filter: blur(4px);
+        }
+
+        h1.title {
+            font-family: var(--font-serif);
+            font-size: 2.1rem;
+            line-height: 1.15;
+            color: #92400e;
+            font-weight: 800;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        p.subtitle {
+            font-size: 0.82rem;
+            color: #78350f;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .tab-switcher {
+            display: flex;
+            width: 100%;
+            background: rgba(254, 243, 199, 0.75);
+            backdrop-filter: blur(6px);
+            padding: 4px;
+            border-radius: 14px;
+            margin-top: 14px;
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 6px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+            color: #92400e;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: #b45309;
+            box-shadow: 0 3px 10px rgba(180, 83, 9, 0.15);
+        }
+
+        .tab-content {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        .tab-content.active {
+            display: flex;
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            border-radius: var(--radius-card);
+            padding: 18px 16px;
+            width: 100%;
+            box-shadow: 0 10px 25px -4px rgba(217, 119, 6, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            text-align: center;
+        }
+
+        .pot-viewport {
+            width: 100%;
+            height: 290px;
+            background: linear-gradient(180deg, #eff6ff 0%, #fef9c3 60%, #fef08a 100%);
+            border-radius: 16px;
+            border: 2px solid #fde68a;
+            position: relative;
+            overflow: hidden;
+            margin: 12px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.06);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sun-disk {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle, #fef08a 25%, #facc15 85%);
+            border-radius: 50%;
+            box-shadow: 0 0 20px #facc15;
+            animation: sunPulse 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes sunPulse {
+            from { transform: scale(1); box-shadow: 0 0 14px #facc15; }
+            to { transform: scale(1.08); box-shadow: 0 0 26px #f59e0b; }
+        }
+
+        /* Botanical Plant Container anchored to soil */
+        .plant-system {
+            position: relative;
+            width: 160px;
+            height: 255px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            z-index: 2;
+        }
+
+        /* Terracotta Pot geometry */
+        .pot-rim {
+            width: 148px;
+            height: 18px;
+            background: linear-gradient(90deg, #b45309, #d97706, #92400e);
+            border-radius: 9px;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.18);
+        }
+
+        .pot-soil {
+            position: absolute;
+            top: 2px;
+            left: 8px;
+            right: 8px;
+            height: 10px;
+            background: #381a07;
+            border-radius: 50%;
+            z-index: 6;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .pot-body {
+            width: 126px;
+            height: 72px;
+            background: linear-gradient(180deg, var(--terracotta) 0%, var(--terracotta-dark) 100%);
+            clip-path: polygon(0 0, 100% 0, 84% 100%, 16% 100%);
+            position: relative;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 10px;
+            box-shadow: inset 0 -4px 10px rgba(0,0,0,0.25);
+        }
+
+        .pot-label {
+            font-size: 0.72rem;
+            color: #ffedd5;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Stem anchor rooted inside the soil */
+        .plant-stem-anchor {
+            position: absolute;
+            bottom: 78px;
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .stem {
+            width: 8px;
+            background: linear-gradient(90deg, #4ade80, #16a34a, #15803d);
+            border-radius: 4px;
+            transition: height 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            box-shadow: 1px 0 3px rgba(0,0,0,0.15);
+        }
+
+        .leaf {
+            position: absolute;
+            width: 24px;
+            height: 14px;
+            background: linear-gradient(135deg, #4ade80, #15803d);
+            border-radius: 14px 0 14px 0;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+        }
+
+        .leaf.left {
+            left: -20px;
+            top: 40%;
+            transform-origin: right center;
+            transform: rotate(-25deg) scale(0);
+        }
+
+        .leaf.right {
+            right: -20px;
+            top: 22%;
+            border-radius: 0 14px 0 14px;
+            transform-origin: left center;
+            transform: rotate(25deg) scale(0);
+        }
+
+        .leaf.visible { opacity: 1; }
+        .leaf.left.visible { transform: rotate(-25deg) scale(1); }
+        .leaf.right.visible { transform: rotate(25deg) scale(1); }
+
+        /* Flower head placed at top of stem */
+        .flower-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -85%) scale(0);
+            transition: transform 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .flower-head.swaying {
+            animation: springBreeze 3.4s ease-in-out infinite alternate;
+        }
+
+        @keyframes springBreeze {
+            0% { transform: translate(-50%, -85%) scale(1) rotate(-5deg); }
+            100% { transform: translate(-50%, -85%) scale(1) rotate(5deg); }
+        }
+
+        .bud {
+            width: 24px;
+            height: 32px;
+            background: linear-gradient(180deg, #facc15, #84cc16);
+            border-radius: 50% 50% 40% 40%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .sunflower {
+            width: 86px;
+            height: 86px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .petals-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .petal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 40px;
+            background: linear-gradient(180deg, #fef08a 0%, #eab308 60%, #ca8a04 100%);
+            border-radius: 50% 50% 20% 20%;
+            transform-origin: center bottom;
+            margin-left: -8px;
+            margin-top: -40px;
+            box-shadow: 0 1px 3px rgba(180, 83, 9, 0.25);
+        }
+
+        .sunflower-center {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #78350f 30%, #451a03 90%);
+            border-radius: 50%;
+            border: 2px solid #ca8a04;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .seedling {
+            position: absolute;
+            bottom: 0;
+            width: 12px;
+            height: 12px;
+            background: #a16207;
+            border-radius: 50% 0 50% 50%;
+            transform: rotate(45deg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-water {
+            width: 100%;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            border: none;
+            padding: 13px 18px;
+            font-size: 0.94rem;
+            font-weight: 700;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px -2px rgba(217, 119, 6, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-water:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 7px;
+            background: #fed7aa;
+            border-radius: 999px;
+            overflow: hidden;
+            margin: 10px 0 14px;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #eab308);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+
+        .bloomed-letter {
+            display: none;
+            background: #fffdf5;
+            border: 1.5px dashed #f59e0b;
+            border-radius: 16px;
+            padding: 18px 16px;
+            margin-top: 14px;
+            text-align: left;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12);
+            animation: fadeIn 0.6s ease;
+        }
+
+        .bloomed-letter h3 {
+            font-family: var(--font-serif);
+            font-size: 1.18rem;
+            color: #b45309;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .bloomed-letter p {
+            font-size: 0.85rem;
+            line-height: 1.55;
+            color: #573011;
+            margin-bottom: 9px;
+        }
+
+        .letter-signature {
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            font-style: italic;
+            text-align: right;
+            color: #b45309;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .cards-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .scratch-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1.5px solid #fed7aa;
+            box-shadow: 0 4px 14px rgba(180, 83, 9, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            background: #fffbeb;
+            border-bottom: 1px solid #fed7aa;
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-tag {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #b45309;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-status {
+            font-size: 0.7rem;
+            color: #92400e;
+            background: #fef3c7;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .scratch-wrapper {
+            position: relative;
+            width: 100%;
+            height: 165px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .letter-content {
+            position: absolute;
+            inset: 0;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #fffdf8 0%, #fffbeb 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+            z-index: 1;
+        }
+
+        .letter-title {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            font-weight: bold;
+            color: #92400e;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .letter-body {
+            font-size: 0.81rem;
+            line-height: 1.48;
+            color: #451a03;
+        }
+
+        .scratch-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            cursor: pointer;
+            touch-action: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .card-footer {
+            padding: 7px 14px 8px;
+            background: #fffdf5;
+            border-top: 1px solid #fef3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-tip {
+            font-size: 0.68rem;
+            color: #a16207;
+            font-style: italic;
+        }
+
+        .btn-reveal {
+            background: transparent;
+            border: 1px solid #fed7aa;
+            color: #d97706;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reveal:active {
+            background: #fef3c7;
+        }
+
+        footer {
+            margin-top: 18px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-shower {
+            width: 100%;
+            background: linear-gradient(135deg, #f5af19, #e17055);
+            color: white;
+            border: none;
+            padding: 13px 18px;
+            font-size: 0.94rem;
+            font-weight: 700;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(225, 112, 85, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .footer-note {
+            font-size: 0.73rem;
+            color: #78350f;
+            margin-top: 9px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Native Canvas Background & Confetti Overlay -->
+    <canvas id="ambient-canvas"></canvas>
+    <canvas id="celebration-canvas"></canvas>
+
+    <div class="container">
+        
+        <header>
+            <div class="pill-tag">🌻 21 DE SEPTIEMBRE • PARA MI PECHOCHA 🌻</div>
+            <h1 class="title">Nuestras Flores Amarillas</h1>
+            <p class="subtitle">De tu osote para su mujercita hermosa </p>
+
+            <div class="tab-switcher">
+                <button id="btn-tab-pot" class="tab-btn active" onclick="switchView('pot')">
+                    <span>🌱</span> Sembrar Nuestra Flor
+                </button>
+                <button id="btn-tab-cards" class="tab-btn" onclick="switchView('cards')">
+                    <span>💌</span> Cartas Rascables
+                </button>
+            </div>
+        </header>
+
+        <div id="tab-pot-panel" class="tab-content active">
+            <div class="glass-card">
+                <h2 style="font-size: 1.05rem; font-weight: 800; color: #78350f;">Haz Brotar Nuestra Flor de Primavera</h2>
+                <p style="font-size: 0.76rem; color: #92400e; margin-top: 3px;">
+                    Dale toquecitos a la maceta para regarla y ver cómo brota para ti hoy 21.
+                </p>
+
+                <!-- Pot Viewport -->
+                <div class="pot-viewport" id="pot-touch-area" onclick="waterPlant()">
+                    <div class="sun-disk"></div>
+
+                    <!-- Complete Plant System anchored inside the pot -->
+                    <div class="plant-system">
+                        
+                        <!-- Anchored in soil: grows upward from the base -->
+                        <div class="plant-stem-anchor">
+                            
+                            <!-- Top Element: Bud or Blooming Sunflower -->
+                            <div id="flower-head-el" class="flower-head">
+                                <div id="bud-graphic" class="bud" style="display: none;"></div>
+
+                                <div id="sunflower-graphic" class="sunflower" style="display: none;">
+                                    <div class="petals-ring" id="petals-ring"></div>
+                                    <div class="sunflower-center">💛</div>
+                                </div>
+                            </div>
+
+                            <!-- Stem height expands dynamically -->
+                            <div id="stem-el" class="stem" style="height: 0px;">
+                                <div id="leaf-1" class="leaf left"></div>
+                                <div id="leaf-2" class="leaf right"></div>
+                                <div id="leaf-3" class="leaf left" style="top: 70%;"></div>
+                            </div>
+
+                            <!-- Initial Seed at Base -->
+                            <div id="seed-el" class="seedling"></div>
+                        </div>
+
+                        <!-- Fixed Clay Flower Pot -->
+                        <div class="pot-rim">
+                            <div class="pot-soil"></div>
+                        </div>
+                        <div class="pot-body">
+                            <span class="pot-label">TÚ & YO 🌍</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress indicator -->
+                <div class="progress-bar-bg">
+                    <div id="growth-progress" class="progress-bar-fill"></div>
+                </div>
+
+                <!-- Water Action Button -->
+                <button id="water-button" class="btn-water" onclick="waterPlant()">
+                    <span>💧</span>
+                    <span id="water-btn-text">Regar nuestra flor (Toque 1 de 5)</span>
+                </button>
+
+                <!-- Heartfelt Love Letter Revealed on Full Blooming -->
+                <div id="bloomed-love-letter" class="bloomed-letter">
+                    <h3>🌻 Feliz 21 de Septiembre, Mi Amor</h3>
+                    <p>
+                        Aunque la distancia joda y no pueda dártelas en tus manitos ahorita mismo, sabes que mi cabeza y mi corazón solo están contigo.
+                    </p>
+                    <p>
+                        Amo todo de ti: cuando te pones de renegona, cuando me haces tus bromas, cuando te me quedas dormida en un segundo y hasta cuando me dices que tengo ojos de mapache. Gracias por ser esa mujer trabajadora, tierna y única que me alegra todos los días.  <strong>Muy pronto estaré contigo para llenarte los brazos de flores de verdad y darte el abrazo que más deseo.</strong>
+                    </p>
+                    <div class="letter-signature">De tu marido que te adora: Tu Osote 🐻💛</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-cards-panel" class="tab-content">
+            <div class="cards-list">
+                
+                <!-- CARD 1 -->
+                <div class="scratch-card">
+                    <div class="card-header">
+                        <span class="card-tag">💌 Carta 1 • Abacho de Oso</span>
+                        <span class="card-status" id="status-card-1">Por raspar ✨</span>
+                    </div>
+                    <div class="scratch-wrapper">
+                        <div class="letter-content">
+                            <div class="letter-title"><span>🐻</span> Tu osote</div>
+                            <div class="letter-body">
+                                Siempre me pides tu abachote fuerte para recargarte cuando andas cansadita de la chamba o cuando te duelen tus patitas. Te juro que cada noche me imagino teniéndote bien apegada a mi pecho, durmiendo juntos de cucharita y dándote mimitos hasta que te gane el sueño. Eres mi lugar seguro, mi bebé.
+                            </div>
+                        </div>
+                        <canvas id="scratch-1" class="scratch-canvas" data-id="1"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-tip">Desliza tu dedito arriba 👆</span>
+                        <button class="btn-reveal" onclick="forceRevealCard(1)">Descubrir cartita 🔓</button>
+                    </div>
+                </div>
+
+                <!-- CARD 2 -->
+                <div class="scratch-card">
+                    <div class="card-header">
+                        <span class="card-tag">🌼 Carta 2 • El Sueñito</span>
+                        <span class="card-status" id="status-card-2">Por raspar ✨</span>
+                    </div>
+                    <div class="scratch-wrapper">
+                        <div class="letter-content">
+                            <div class="letter-title"><span>🌻</span> Mi dormilona</div>
+                            <div class="letter-body">
+                                Cuando me dices que no tienes sueño y a los dos minutos ya te quedaste completamente dormidita. Me encanta que sientas tanta calma al hablar conmigo. Duerme rico, mi pechocha, que aquí tu osote siempre va a estar para cuidarte y darte tus bechitos y dormir acurrucaditos. Te amo muchísimo.
+                            </div>
+                        </div>
+                        <canvas id="scratch-2" class="scratch-canvas" data-id="2"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-tip">Desliza tu dedito arriba 👆</span>
+                        <button class="btn-reveal" onclick="forceRevealCard(2)">Descubrir cartita 🔓</button>
+                    </div>
+                </div>
+
+                <!-- CARD 3 -->
+                <div class="scratch-card">
+                    <div class="card-header">
+                        <span class="card-tag">🌙 Carta 3 • 🤍 Mi blanquita hermocha</span>
+                        <span class="card-status" id="status-card-3">Por raspar ✨</span>
+                    </div>
+                    <div class="scratch-wrapper">
+                        <div class="letter-content">
+                            <div class="letter-title"><span>✨</span> Mi mujercita</div>
+                            <div class="letter-body">
+                                Aunque siempre te diga negra de cariño para molestarte y tú me reclames que eres blanquita, para mí eres la mujer más linda y perfecta del mundo. Me encanta hacerte renegar, pero más me gusta cuando te ríes de mis tonterías y me mandas tus besotes. Te amo muchísimo, mi pechocha, gracias por quererme con todo y mis bromas; eres y siempre serás la única dueña de mi corazón.
+                            </div>
+                        </div>
+                        <canvas id="scratch-3" class="scratch-canvas" data-id="3"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-tip">Desliza tu dedito arriba 👆</span>
+                        <button class="btn-reveal" onclick="forceRevealCard(3)">Descubrir cartita 🔓</button>
+                    </div>
+                </div>
+
+                <!-- CARD 4 -->
+                <div class="scratch-card">
+                    <div class="card-header">
+                        <span class="card-tag">✈️ Carta 4 • La Promesa</span>
+                        <span class="card-status" id="status-card-4">Por raspar ✨</span>
+                    </div>
+                    <div class="scratch-wrapper">
+                        <div class="letter-content">
+                            <div class="letter-title"><span>💛</span> Hasta que estemos viejitos mi amor</div>
+                            <div class="letter-body">
+                                Te acuerdas cuando me dijiste que eras muy complicada y te dije que te quiero así tal cual eres? No pienso soltarte. Nuestra meta sigue en pie: cuando vengas a verme, ir a pasear, tomarnos mil fotos y darte ese anillo de promesa en tu manito. Ni mil kilómetros van a cambiar que eres mi mujer y yo tu marido.
+                            </div>
+                        </div>
+                        <canvas id="scratch-4" class="scratch-canvas" data-id="4"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-tip">Desliza tu dedito arriba 👆</span>
+                        <button class="btn-reveal" onclick="forceRevealCard(4)">Descubrir cartita 🔓</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer>
+            <button class="btn-shower" onclick="triggerPetalShower()">
+                <span>✨</span> Lluvia de Pétalos Dorados
+            </button>
+            <p class="footer-note">Hecho por tu Osote especialmente para su princesita • 21 de Septiembre 💛</p>
+        </footer>
+
+    </div>
+
+    <script>
+        /* View navigation between Pot and Scratch Cards */
+        function switchView(tabKey) {
+            const tabPot = document.getElementById('tab-pot-panel');
+            const tabCards = document.getElementById('tab-cards-panel');
+            const btnPot = document.getElementById('btn-tab-pot');
+            const btnCards = document.getElementById('btn-tab-cards');
+
+            if (tabKey === 'pot') {
+                tabPot.classList.add('active');
+                tabCards.classList.remove('active');
+                btnPot.classList.add('active');
+                btnCards.classList.remove('active');
+            } else {
+                tabCards.classList.add('active');
+                tabPot.classList.remove('active');
+                btnCards.classList.add('active');
+                btnPot.classList.remove('active');
+                
+                // Initialize scratch canvases when card panel is visible
+                setTimeout(initScratchCards, 50);
+            }
+        }
+
+        /* Build 16 Radial Sunflower Petals */
+        function renderSunflowerPetals() {
+            const ring = document.getElementById('petals-ring');
+            ring.innerHTML = '';
+            const count = 16;
+            for (let i = 0; i < count; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                const angle = (360 / count) * i;
+                petal.style.transform = `rotate(${angle}deg)`;
+                ring.appendChild(petal);
+            }
+        }
+        renderSunflowerPetals();
+
+        /* Web Audio API synthesizer for cute chime on water and blooming */
+        let audioCtx = null;
+        function playChime(freq = 520, type = 'sine', duration = 0.4) {
+            try {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) audioCtx = new AudioContextClass();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                if (!audioCtx) return;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (err) {
+                // Silently ignore audio autoplay restrictions
+            }
+        }
+
+        function playBloomHarp() {
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, idx) => {
+                setTimeout(() => playChime(freq, 'triangle', 0.8), idx * 110);
+            });
+        }
+
+        let growthStep = 0;
+        const maxSteps = 5;
+
+        function waterPlant() {
+            if (growthStep >= maxSteps) return;
+
+            growthStep++;
+            playChime(350 + growthStep * 70);
+
+            const stem = document.getElementById('stem-el');
+            const seed = document.getElementById('seed-el');
+            const flowerHead = document.getElementById('flower-head-el');
+            const bud = document.getElementById('bud-graphic');
+            const sunflower = document.getElementById('sunflower-graphic');
+            const progressBar = document.getElementById('growth-progress');
+            const waterBtnText = document.getElementById('water-btn-text');
+            const waterBtn = document.getElementById('water-button');
+            const letter = document.getElementById('bloomed-love-letter');
+
+            progressBar.style.width = (growthStep * 20) + '%';
+
+            // Stage 1: Sprout emerges
+            if (growthStep === 1) {
+                seed.style.transform = 'scale(1.2) translateY(-2px)';
+                stem.style.height = '24px';
+                waterBtnText.textContent = 'Regar nuestra flor (Toque 2 de 5)';
+            }
+            // Stage 2: Stalk grows upward with first leaf
+            else if (growthStep === 2) {
+                stem.style.height = '65px';
+                document.getElementById('leaf-1').classList.add('visible');
+                waterBtnText.textContent = 'Regar nuestra flor (Toque 3 de 5)';
+            }
+            // Stage 3: Stem taller with second leaf
+            else if (growthStep === 3) {
+                stem.style.height = '110px';
+                document.getElementById('leaf-2').classList.add('visible');
+                waterBtnText.textContent = 'Regar nuestra flor (Toque 4 de 5)';
+            }
+            // Stage 4: Stem tall with lush leaves and closed golden bud
+            else if (growthStep === 4) {
+                stem.style.height = '145px';
+                document.getElementById('leaf-3').classList.add('visible');
+                bud.style.display = 'block';
+                sunflower.style.display = 'none';
+                flowerHead.style.transform = 'translate(-50%, -85%) scale(1)';
+                waterBtnText.textContent = '¡Último riego para florecer! (Toque 5 de 5)';
+            }
+            // Stage 5: Full blooming sunflower, swaying animation, love letter reveal
+            else if (growthStep === 5) {
+                stem.style.height = '145px';
+                bud.style.display = 'none';
+                sunflower.style.display = 'flex';
+                flowerHead.style.transform = 'translate(-50%, -85%) scale(1)';
+                flowerHead.classList.add('swaying');
+
+                waterBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                waterBtnText.textContent = '🌻 ¡Nuestra Flor Floreció!';
+                waterBtn.disabled = true;
+
+                letter.style.display = 'block';
+                playBloomHarp();
+                triggerPetalShower();
+            }
+
+            createWaterDropEffect();
+        }
+
+        function createWaterDropEffect() {
+            const potArea = document.getElementById('pot-touch-area');
+            const drop = document.createElement('div');
+            drop.innerHTML = '💧';
+            drop.style.position = 'absolute';
+            drop.style.left = (35 + Math.random() * 30) + '%';
+            drop.style.top = '25%';
+            drop.style.fontSize = '22px';
+            drop.style.pointerEvents = 'none';
+            drop.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            drop.style.opacity = '1';
+            potArea.appendChild(drop);
+
+            setTimeout(() => {
+                drop.style.transform = 'translateY(110px) scale(0.6)';
+                drop.style.opacity = '0';
+            }, 20);
+
+            setTimeout(() => drop.remove(), 650);
+        }
+
+        const scratchCards = {};
+
+        function initScratchCards() {
+            for (let i = 1; i <= 4; i++) {
+                initCardCanvas(i);
+            }
+        }
+
+        function initCardCanvas(id) {
+            const canvas = document.getElementById(`scratch-${id}`);
+            if (!canvas) return;
+            if (scratchCards[id] && scratchCards[id].cleared) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const width = Math.floor(rect.width || 360);
+            const height = Math.floor(rect.height || 165);
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // FIX: Using willReadFrequently to optimize getImageData and prevent console warning
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+            // Metallic Gold scratchable cover
+            const grad = ctx.createLinearGradient(0, 0, width, height);
+            grad.addColorStop(0, '#f59e0b');
+            grad.addColorStop(0.3, '#fde047');
+            grad.addColorStop(0.7, '#f59e0b');
+            grad.addColorStop(1, '#d97706');
+
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Shimmer sparkles
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+            for (let j = 0; j < 35; j++) {
+                ctx.beginPath();
+                ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 2.5 + 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Instructional text
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillStyle = '#78350f';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✨ Raspa aquí con tu dedito ✨', width / 2, height / 2 - 8);
+            
+            ctx.font = '11px sans-serif';
+            ctx.fillStyle = '#92400e';
+            ctx.fillText('💛 Descubre mi mensaje para ti', width / 2, height / 2 + 14);
+
+            scratchCards[id] = {
+                isScratching: false,
+                canvas: canvas,
+                ctx: ctx,
+                cleared: false,
+                lastCheckTime: 0
+            };
+
+            // Touch & Mouse bindings
+            canvas.onmousedown = (e) => startScratching(e, id);
+            canvas.onmousemove = (e) => continueScratching(e, id);
+            window.addEventListener('mouseup', () => stopScratching(id));
+
+            canvas.addEventListener('touchstart', (e) => startScratching(e, id), { passive: false });
+            canvas.addEventListener('touchmove', (e) => continueScratching(e, id), { passive: false });
+            window.addEventListener('touchend', () => stopScratching(id));
+        }
+
+        function getPointerCoords(e, canvas) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.touches && e.touches[0]) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startScratching(e, id) {
+            e.preventDefault();
+            const state = scratchCards[id];
+            if (state && !state.cleared) {
+                state.isScratching = true;
+                continueScratching(e, id);
+            }
+        }
+
+        function continueScratching(e, id) {
+            const state = scratchCards[id];
+            if (!state || !state.isScratching || state.cleared) return;
+            e.preventDefault();
+
+            const pos = getPointerCoords(e, state.canvas);
+            const ctx = state.ctx;
+
+            // Scratch away top layer
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Throttled progress check (at most once every 120ms)
+            const now = Date.now();
+            if (now - state.lastCheckTime > 120) {
+                state.lastCheckTime = now;
+                evaluateScratchProgress(id);
+            }
+        }
+
+        function stopScratching(id) {
+            const state = scratchCards[id];
+            if (state && state.isScratching) {
+                state.isScratching = false;
+                evaluateScratchProgress(id);
+            }
+        }
+
+        function evaluateScratchProgress(id) {
+            const state = scratchCards[id];
+            if (!state || state.cleared) return;
+
+            const w = state.canvas.width;
+            const h = state.canvas.height;
+            const imgData = state.ctx.getImageData(0, 0, w, h);
+            const pixels = imgData.data;
+            let clearedCount = 0;
+            const step = 32; // Sample every 32nd pixel for mobile efficiency
+
+            for (let i = 3; i < pixels.length; i += 4 * step) {
+                if (pixels[i] === 0) {
+                    clearedCount++;
+                }
+            }
+
+            const totalSampled = pixels.length / (4 * step);
+            const ratio = clearedCount / totalSampled;
+
+            // If ~45% scratched, smoothly reveal card completely
+            if (ratio > 0.45) {
+                forceRevealCard(id);
+            }
+        }
+
+        function forceRevealCard(id) {
+            const state = scratchCards[id];
+            const canvas = document.getElementById(`scratch-${id}`);
+            const statusBadge = document.getElementById(`status-card-${id}`);
+
+            if (canvas) {
+                canvas.style.opacity = '0';
+                setTimeout(() => {
+                    canvas.style.display = 'none';
+                }, 320);
+            }
+
+            if (statusBadge) {
+                statusBadge.textContent = 'Leída con amor 💛';
+                statusBadge.style.background = '#dcfce7';
+                statusBadge.style.color = '#15803d';
+            }
+
+            if (state) {
+                state.cleared = true;
+                state.isScratching = false;
+            }
+
+            playChime(600, 'sine', 0.25);
+            burstSingleCardConfetti();
+        }
+
+        const ambientCanvas = document.getElementById('ambient-canvas');
+        const ambientCtx = ambientCanvas.getContext('2d');
+        const celeCanvas = document.getElementById('celebration-canvas');
+        const celeCtx = celeCanvas.getContext('2d');
+
+        function resizeCanvases() {
+            ambientCanvas.width = window.innerWidth;
+            ambientCanvas.height = window.innerHeight;
+            celeCanvas.width = window.innerWidth;
+            celeCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvases();
+            initScratchCards();
+        });
+        resizeCanvases();
+
+        // Background gentle drifting petals
+        const ambientPetals = [];
+        for (let i = 0; i < 24; i++) {
+            ambientPetals.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 8 + 6,
+                speedX: Math.random() * 0.8 - 0.4,
+                speedY: Math.random() * 1.1 + 0.5,
+                angle: Math.random() * 360,
+                spin: Math.random() * 2 - 1,
+                opacity: Math.random() * 0.45 + 0.3
+            });
+        }
+
+        function renderAmbientLoop() {
+            ambientCtx.clearRect(0, 0, ambientCanvas.width, ambientCanvas.height);
+
+            ambientPetals.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.angle += p.spin;
+
+                if (p.y > window.innerHeight + 20) {
+                    p.y = -20;
+                    p.x = Math.random() * window.innerWidth;
+                }
+                if (p.x > window.innerWidth + 20) p.x = -20;
+                if (p.x < -20) p.x = window.innerWidth + 20;
+
+                ambientCtx.save();
+                ambientCtx.translate(p.x, p.y);
+                ambientCtx.rotate((p.angle * Math.PI) / 180);
+                ambientCtx.fillStyle = `rgba(250, 204, 21, ${p.opacity})`;
+
+                ambientCtx.beginPath();
+                ambientCtx.moveTo(0, -p.size);
+                ambientCtx.quadraticCurveTo(p.size * 0.8, 0, 0, p.size);
+                ambientCtx.quadraticCurveTo(-p.size * 0.8, 0, 0, -p.size);
+                ambientCtx.fill();
+                ambientCtx.restore();
+            });
+
+            requestAnimationFrame(renderAmbientLoop);
+        }
+        renderAmbientLoop();
+
+        // Celebratory Shower Particles
+        let burstParticles = [];
+
+        function triggerPetalShower() {
+            const colors = ['#fde047', '#facc15', '#eab308', '#ca8a04', '#ffffff'];
+            for (let i = 0; i < 90; i++) {
+                burstParticles.push({
+                    x: Math.random() * celeCanvas.width,
+                    y: -10 - Math.random() * 40,
+                    size: Math.random() * 10 + 8,
+                    speedX: Math.random() * 4 - 2,
+                    speedY: Math.random() * 3.5 + 2.5,
+                    angle: Math.random() * 360,
+                    spin: Math.random() * 5 - 2.5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 1
+                });
+            }
+        }
+
+        function burstSingleCardConfetti() {
+            const colors = ['#fde047', '#facc15', '#fbbf24'];
+            for (let i = 0; i < 28; i++) {
+                burstParticles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight * 0.55,
+                    size: Math.random() * 7 + 5,
+                    speedX: (Math.random() - 0.5) * 7,
+                    speedY: (Math.random() - 0.7) * 7,
+                    angle: Math.random() * 360,
+                    spin: Math.random() * 6 - 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 1
+                });
+            }
+        }
+
+        function renderCelebrationLoop() {
+            celeCtx.clearRect(0, 0, celeCanvas.width, celeCanvas.height);
+
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                const pt = burstParticles[i];
+                pt.x += pt.speedX;
+                pt.y += pt.speedY;
+                pt.angle += pt.spin;
+                pt.life -= 0.007;
+
+                if (pt.y > celeCanvas.height || pt.life <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+
+                celeCtx.save();
+                celeCtx.translate(pt.x, pt.y);
+                celeCtx.rotate((pt.angle * Math.PI) / 180);
+                celeCtx.fillStyle = pt.color;
+                celeCtx.globalAlpha = Math.max(0, pt.life);
+
+                celeCtx.beginPath();
+                celeCtx.moveTo(0, -pt.size);
+                celeCtx.quadraticCurveTo(pt.size * 0.7, 0, 0, pt.size);
+                celeCtx.quadraticCurveTo(-pt.size * 0.7, 0, 0, -pt.size);
+                celeCtx.fill();
+                celeCtx.restore();
+            }
+
+            requestAnimationFrame(renderCelebrationLoop);
+        }
+        renderCelebrationLoop();
+
+        // Initial setup on window load
+        window.addEventListener('load', () => {
+            initScratchCards();
+        });
+    </script>
+</body>
+</html>
